@@ -36,7 +36,11 @@ function App() {
   return (
     <div className="app">
       <span className="about">
-        <a href="mailto:harrison.munguambe17@gmail.com">
+        <a
+          rel="noreferrer"
+          target="_blank"
+          href="mailto:harrison.munguambe17@gmail.com"
+        >
           Desenvolvido por Harrison Munguambe.
         </a>
       </span>
