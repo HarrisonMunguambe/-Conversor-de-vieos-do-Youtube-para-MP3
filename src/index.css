@@ -167,12 +167,13 @@ body {
   font-size: 18px;
   font-weight: bold;
   text-decoration: none;
-  cursor: pointer;
+
   transition: background-color 0.3s ease;
 }
 
-.download_btn:hover {
+.download_btn .a:hover {
   background-color: #ff524a;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 600px) {

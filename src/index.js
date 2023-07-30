@@ -1,20 +1,22 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
+import React, { useRef, useState } from "react";
+import ReactDOM from "react-dom";
+import { ScaleLoader } from "react-spinners";
 import "./index.css";
-import { useRef, useState } from "react";
-import axios from "axios";
 import { youtube_parser } from "./utils";
+import axios from "axios";
 
 function App() {
   const inputURLRef = useRef();
   const [urlResult, setUrlResult] = useState(null);
+  const [loading, setLoading] = useState(false); // Estado para controlar o efeito de loading
+  const [videoNotFound, setVideoNotFound] = useState(false); // Estado para controlar a mensagem de vídeo não encontrado
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(inputURLRef.current.value);
+    setLoading(true); // Ativa o efeito de loading enquanto aguarda a resposta da API
+    setVideoNotFound(false); // Reseta o estado videoNotFound
 
     const youtubeID = youtube_parser(inputURLRef.current.value);
-    console.log(youtubeID);
 
     const options = {
       method: "get",
@@ -28,11 +30,29 @@ function App() {
       },
     };
     axios(options)
-      .then((res) => setUrlResult(res.data.link))
-      .catch((err) => console.log(err));
+      .then((res) => {
+        setLoading(false); // Desativa o efeito de loading quando a resposta da API é obtida
+        if (res.data.error) {
+          setVideoNotFound(true); // Define o estado videoNotFound como true se o vídeo não for encontrado
+        } else {
+          setUrlResult(res.data.link);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false); // Certifique-se de desativar o efeito de loading em caso de erro
+      });
 
     inputURLRef.current.value = "";
   };
+
+  const handleDownloadClick = () => {
+    if (urlResult) {
+      // Oculta o botão de download após o clique
+      setUrlResult(null);
+    }
+  };
+
   return (
     <div className="app">
       <span className="about">
@@ -46,7 +66,6 @@ function App() {
       </span>
       <section className="content">
         <h1 className="content_title">
-          {" "}
           Conversor de vídeos do Youtube para MP3
         </h1>
         <p className="content_description">
@@ -63,17 +82,27 @@ function App() {
           <button type="submit" className="form_button">
             Pesquisar
           </button>
-          {urlResult ? (
+          {/* Renderiza a mensagem de vídeo não encontrado se o estado "videoNotFound" for true */}
+          {videoNotFound && (
+            <div className="download_btn">Vídeo indisponível</div>
+          )}
+          {/* Renderiza o efeito de loading se o estado "loading" for true */}
+          {loading && (
+            <div className="loading">
+              <ScaleLoader size={10} color={"#333"} loading={true} />
+            </div>
+          )}
+          {/* Renderiza o link de download apenas se "urlResult" for verdadeiro */}
+          {urlResult && (
             <a
               href={urlResult}
               target="_blank"
               rel="noreferrer"
-              className="download_btn"
+              className="download_btn a"
+              onClick={handleDownloadClick}
             >
               Baixar o MP3
             </a>
-          ) : (
-            " "
           )}
         </form>
       </section>
@@ -87,7 +116,3 @@ root.render(
     <App />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
