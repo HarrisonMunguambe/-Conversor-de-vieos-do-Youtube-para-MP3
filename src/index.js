@@ -83,7 +83,7 @@ function App() {
             Pesquisar
           </button>
           {/* Renderiza a mensagem de vídeo não encontrado se o estado "videoNotFound" for true */}
-          {videoNotFound && (
+          {videoNotFound && !loading && (
             <div className="download_btn">Vídeo indisponível</div>
           )}
           {/* Renderiza o efeito de loading se o estado "loading" for true */}
@@ -93,7 +93,7 @@ function App() {
             </div>
           )}
           {/* Renderiza o link de download apenas se "urlResult" for verdadeiro */}
-          {urlResult && (
+          {urlResult && !loading && !videoNotFound && (
             <a
               href={urlResult}
               target="_blank"
